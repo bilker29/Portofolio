@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import IdCard from "../components/IdCard";
 
 const StatusBadge = memo(() => (
   <div
@@ -324,60 +325,50 @@ const Home = () => {
                 </div>
               </div>
 
-              {/* Right Column - Hero Graphic & Floating Tech Badges */}
+              {/* Right Column - 3D Hanging ID Card & Floating Tech Badges */}
               <div
-                className="w-full lg:w-1/2 relative flex items-center justify-center order-2 py-6 lg:py-0"
+                className="w-full lg:w-1/2 relative flex items-center justify-center order-2 py-4 lg:py-0"
                 onMouseEnter={() => setIsHovering(true)}
                 onMouseLeave={() => setIsHovering(false)}
                 data-aos="fade-left"
                 data-aos-delay="300"
               >
-                {/* Floating Tech Badges around Graphic */}
+                {/* Floating Tech Badges around ID Card */}
                 <FloatingBadge
                   icon={Code2}
                   label="Java GUI & Web"
-                  positionClass="-top-2 left-6 sm:left-12"
+                  positionClass="-top-4 left-4 sm:left-8"
                   delayClass="animate-float-slow"
                 />
                 <FloatingBadge
                   icon={ShieldCheck}
                   label="BNSP IT Certified"
-                  positionClass="top-16 right-0 sm:right-6"
+                  positionClass="top-24 -right-2 sm:right-2"
                   delayClass="animate-float-reverse"
                 />
                 <FloatingBadge
                   icon={Terminal}
                   label="Cisco Networking"
-                  positionClass="bottom-20 left-2 sm:left-8"
+                  positionClass="bottom-16 -left-2 sm:left-4"
                   delayClass="animate-float-slow"
                 />
                 <FloatingBadge
                   icon={Award}
                   label="GSA 2026"
-                  positionClass="-bottom-4 right-8 sm:right-16"
+                  positionClass="-bottom-4 right-6 sm:right-12"
                   delayClass="animate-float-reverse"
                 />
 
-                {/* Animated Graphic Container */}
-                <div className="relative w-full max-w-[520px] aspect-square flex items-center justify-center">
-                  {/* Outer Glowing Halo Rings */}
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-tr from-sky-400/20 via-teal-400/20 to-emerald-400/20 rounded-full blur-3xl transition-all duration-700 ${
-                      isHovering ? "scale-110 opacity-80" : "scale-100 opacity-50"
-                    }`}
-                  ></div>
+                {/* Outer Glowing Halo Rings */}
+                <div
+                  className={`absolute inset-0 bg-gradient-to-tr from-sky-400/25 via-teal-400/25 to-emerald-400/25 rounded-full blur-3xl transition-all duration-700 pointer-events-none ${
+                    isHovering ? "scale-115 opacity-80" : "scale-100 opacity-45"
+                  }`}
+                ></div>
 
-                  <div className="absolute inset-4 rounded-3xl border border-sky-200/50 bg-white/40 backdrop-blur-xl shadow-2xl shadow-sky-500/10 overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-sky-400/10 to-transparent rounded-bl-full pointer-events-none"></div>
-
-                    <img
-                      src="Animation1.gif"
-                      alt="Developer Graphic"
-                      className={`w-full h-full object-contain p-6 sm:p-10 transition-transform duration-700 ease-out ${
-                        isHovering ? "scale-105 rotate-1" : "scale-100"
-                      }`}
-                    />
-                  </div>
+                {/* Interactive 3D Hanging ID Card */}
+                <div className="relative z-10 w-full flex items-center justify-center">
+                  <IdCard />
                 </div>
               </div>
             </div>

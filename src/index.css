@@ -218,6 +218,91 @@ body {
     box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.3), 0 0 15px rgba(56, 189, 248, 0.3);
 }
 
+/* 3D ID Card & Perspective Utilities */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.perspective-1200 {
+    perspective: 1200px;
+}
+
+.transform-style-3d {
+    transform-style: preserve-3d;
+}
+
+.backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.rotate-y-180 {
+    transform: rotateY(180deg);
+}
+
+@keyframes lanyardSway {
+    0%, 100% {
+        transform: rotate(0deg) translateY(0);
+    }
+    25% {
+        transform: rotate(1.2deg) translateY(-2px);
+    }
+    75% {
+        transform: rotate(-1.2deg) translateY(-1px);
+    }
+}
+
+.animate-lanyard-sway {
+    transform-origin: top center;
+    animation: lanyardSway 6s ease-in-out infinite;
+}
+
+@keyframes holographic {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.holographic-sheen {
+    background: linear-gradient(
+        115deg,
+        transparent 20%,
+        rgba(56, 189, 248, 0.25) 35%,
+        rgba(255, 255, 255, 0.45) 50%,
+        rgba(16, 185, 129, 0.25) 65%,
+        transparent 80%
+    );
+    background-size: 200% 200%;
+}
+
+@keyframes capsulePulse {
+    0%, 100% {
+        box-shadow: 0 0 25px -5px rgba(2, 132, 199, 0.4), 0 0 15px -3px rgba(13, 148, 136, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px -2px rgba(2, 132, 199, 0.7), 0 0 25px 0px rgba(16, 185, 129, 0.5);
+    }
+}
+
+.animate-capsule-glow {
+    animation: capsulePulse 3s infinite ease-in-out;
+}
+
+@keyframes soundWave {
+    0%, 100% {
+        height: 30%;
+    }
+    50% {
+        height: 100%;
+    }
+}
+
 [data-aos] {
     will-change: transform, opacity !important;
 }
