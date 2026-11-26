@@ -1,4 +1,4 @@
-import React, { useEffect, memo, useMemo } from "react";
+import React, { useEffect, useState, memo, useMemo } from "react";
 import {
   FileText,
   Code,
@@ -12,13 +12,16 @@ import {
   MapPin,
   Building2,
   Laptop,
-  Check,
   ShieldCheck,
+  Users,
+  Trophy,
+  Eye,
+  X,
+  Download,
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-// Header Component
 const Header = memo(() => (
   <div className="text-center lg:mb-12 mb-6 px-[5%]">
     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-50 border border-sky-200 mb-3 shadow-sm">
@@ -39,27 +42,24 @@ const Header = memo(() => (
       data-aos="zoom-in-up"
       data-aos-duration="800"
     >
-      Bridging academic excellence with hands-on technical solutions
+      Bridging academic excellence with hands-on software, cloud, and network engineering
     </p>
   </div>
 ));
 
-// Enhanced Profile Image Component with Glowing Aura Ring
 const ProfileImage = memo(() => (
   <div className="flex justify-center lg:justify-end items-center p-2 relative">
     <div className="relative group" data-aos="fade-up" data-aos-duration="900">
-      {/* Outer Glowing Ring */}
-      <div className="absolute -inset-3 bg-gradient-to-r from-[#0284c7] via-[#0d9488] to-[#059669] rounded-full blur-xl opacity-40 group-hover:opacity-75 transition-all duration-700 animate-spin-slow"></div>
+      <div className="absolute -inset-3 bg-gradient-to-r from-[#0284c7] via-[#0d9488] to-[#059669] rounded-full blur-xl opacity-40 group-hover:opacity-75 transition-all duration-700 animate-spin-slow" />
 
-      {/* Floating Badges */}
-      <div className="absolute -top-3 -left-4 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-sky-200 shadow-md text-xs font-bold text-sky-800 flex items-center gap-1.5 animate-float-slow">
+      <div className="absolute -top-3 -left-4 z-20 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-sky-200 shadow-md text-xs font-bold text-sky-800 flex items-center gap-1.5 animate-float-slow">
         <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-        <span>GSA 2026</span>
+        <span>GDGoC & GSA 2026</span>
       </div>
 
-      <div className="absolute -bottom-2 -right-4 z-20 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-xl border border-emerald-200 shadow-md text-xs font-bold text-emerald-800 flex items-center gap-1.5 animate-float-reverse">
+      <div className="absolute -bottom-2 -right-4 z-20 px-3 py-1.5 rounded-full bg-white/95 backdrop-blur-xl border border-emerald-200 shadow-md text-xs font-bold text-emerald-800 flex items-center gap-1.5 animate-float-reverse">
         <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-        <span>KIP-K IPK 3.76</span>
+        <span>KIP-K • IPK 3.76</span>
       </div>
 
       <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-white p-1 bg-white">
@@ -74,28 +74,23 @@ const ProfileImage = memo(() => (
   </div>
 ));
 
-// Glass Stat Card Component
 const StatCard = memo(
   ({ icon: Icon, color, value, label, description, animation }) => (
     <div
       data-aos={animation}
-      data-aos-duration={1000}
+      data-aos-duration={900}
       className="relative group cursor-pointer"
     >
       <div className="relative z-10 glass-card rounded-2xl p-6 border border-slate-200/90 overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-sky-300 h-full flex flex-col justify-between">
         <div
           className={`absolute -z-10 inset-0 bg-gradient-to-br ${color} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}
-        ></div>
+        />
 
         <div className="flex items-center justify-between mb-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-sky-50 text-sky-600 border border-sky-100 group-hover:scale-110 group-hover:rotate-3 transition-transform">
             <Icon className="w-7 h-7 text-sky-600" />
           </div>
-          <span
-            className="text-3xl font-black bg-gradient-to-r from-slate-900 via-sky-900 to-slate-800 bg-clip-text text-transparent"
-            data-aos="fade-up-left"
-            data-aos-duration="1200"
-          >
+          <span className="text-3xl font-black bg-gradient-to-r from-slate-900 via-sky-900 to-slate-800 bg-clip-text text-transparent">
             {value}
           </span>
         </div>
@@ -116,14 +111,110 @@ const StatCard = memo(
   )
 );
 
+const EDUCATION = [
+  {
+    institution: "Universitas Pasundan",
+    location: "Bandung, West Java, Indonesia",
+    degree: "S1 Teknik Informatika (Bachelor of Informatics Engineering)",
+    period: "2024 – Present",
+    grade: "GPA: 3.76 / 4.00",
+    description:
+      "Awarded the KIP-Kuliah full academic scholarship for outstanding academic performance.",
+  },
+  {
+    institution: "SMKN 1 Cikarang Barat",
+    location: "Bekasi, Indonesia",
+    degree: "Computer and Network Engineering (TKJ)",
+    period: "2020 – 2023",
+    grade: "Final Score: 80.6 / 100",
+    description: "Graduated as a Top 4 ranking student in the cohort.",
+  },
+];
+
+const WORK_EXPERIENCES = [
+  {
+    company: "PT Berkah Teknologi Terdepan",
+    role: "Junior Software Engineer (Intern)",
+    period: "2026",
+    type: "Internship",
+    details: [
+      "Developed responsive full-stack web features and executed end-to-end functional, security, and debugging tests to maintain optimal production system performance.",
+    ],
+  },
+  {
+    company: "Universitas Pasundan",
+    role: "Laboratory Assistant (Programming 1)",
+    period: "2026",
+    type: "Academic Staff",
+    details: [
+      "Instructed and mentored undergraduate students in foundational programming logic, algorithms, data structures, and code debugging using Java.",
+    ],
+  },
+  {
+    company: "Universitas Pasundan",
+    role: "Teaching Assistant & Examiner (Web Technology)",
+    period: "2025",
+    type: "Academic Staff",
+    details: [
+      "Evaluated code architecture, database integration, and web functionality (HTML, CSS, PHP) for 10 students across two technical assessment sessions.",
+    ],
+  },
+  {
+    company: "PT Suzuki Sejahtera Buana Trada",
+    role: "IT Assistant (Intern)",
+    period: "Jan 2022 – Mar 2022",
+    type: "Internship",
+    details: [
+      "Performed routine hardware maintenance, OS installations, internal network troubleshooting, and secure user data migrations to minimize operational downtime.",
+    ],
+  },
+];
+
+const ORGANIZATIONS = [
+  {
+    organization: "Google Developer Groups on Campus (GDGoC) Universitas Pasundan",
+    role: "Core Team (Public Relations)",
+    period: "2026 – 2027",
+    tag: "Core Team",
+    description:
+      "Managed external communications, strategic partnerships, and public outreach initiatives to expand developer community engagement across campus.",
+  },
+  {
+    organization: "Google Student Ambassador (GSA)",
+    role: "University Representative",
+    period: "2026 – Present",
+    tag: "Official Liaison",
+    description:
+      "Acted as the official liaison between Google and the university community to promote developer programs and organize campus tech activations.",
+  },
+  {
+    organization: "Pop Survey",
+    role: "Campus Ambassador",
+    period: "2026 – Present",
+    tag: "Ambassador",
+    description:
+      "Executed campus brand awareness campaigns and facilitated student research data collection to drive platform adoption.",
+  },
+];
+
+const CERTIFICATIONS_LIST = [
+  { title: "Sertifikasi IT Dicoding", issuer: "Dicoding Indonesia" },
+  { title: "Teknisi Komputer dan Jaringan", issuer: "LSP BNSP" },
+  { title: "English Proficiency (TOEIC)", issuer: "ETS Certified" },
+  { title: "Sabuk Hitam DAN 1 Karate", issuer: "Martial Arts" },
+  { title: "Juara 2 Kata Perorangan Putra", issuer: "UPI Karate Cup V 2025" },
+];
+
 const AboutPage = () => {
+  const [showCvModal, setShowCvModal] = useState(false);
+
   const { totalProjects, totalCertificates } = useMemo(() => {
     const storedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
     const storedCertificates = JSON.parse(
       localStorage.getItem("certificates") || "[]"
     );
     return {
-      totalProjects: storedProjects.length || 3,
+      totalProjects: storedProjects.length || 6,
       totalCertificates: storedCertificates.length || 5,
     };
   }, []);
@@ -132,13 +223,21 @@ const AboutPage = () => {
     AOS.init({ once: false });
   }, []);
 
+  useEffect(() => {
+    const onEsc = (e) => {
+      if (e.key === "Escape") setShowCvModal(false);
+    };
+    if (showCvModal) window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, [showCvModal]);
+
   const statsData = useMemo(
     () => [
       {
         icon: GraduationCap,
         color: "from-[#0284c7] to-[#059669]",
         value: "3.76",
-        label: "IPK (Beasiswa KIP-K)",
+        label: "GPA (KIP-Kuliah Scholar)",
         description: "Universitas Pasundan",
         animation: "fade-right",
       },
@@ -147,104 +246,20 @@ const AboutPage = () => {
         color: "from-[#059669] to-[#0284c7]",
         value: `${totalProjects}+`,
         label: "Technical Projects",
-        description: "Java GUI, Full-Stack Web & Cisco",
+        description: "Full-Stack, Cloud AWS, Web3 & Cisco",
         animation: "fade-up",
       },
       {
         icon: Award,
         color: "from-[#0284c7] to-[#059669]",
-        value: "BNSP & GSA",
-        label: "Certifications",
-        description: "IT Support, TOEIC & DAN 1 Karate",
+        value: `${totalCertificates}+`,
+        label: "Certifications & Awards",
+        description: "BNSP, Dicoding, TOEIC & Karate",
         animation: "fade-left",
       },
     ],
     [totalProjects, totalCertificates]
   );
-
-  const EDUCATION = [
-    {
-      institution: "Universitas Pasundan",
-      location: "Bandung, Indonesia",
-      degree: "S1 Teknik Informatika",
-      period: "2024 – Sekarang",
-      grade: "IPK: 3.76 / 4.00",
-      description: "Penerima Beasiswa penuh KIP-Kuliah atas prestasi akademik.",
-      icon: GraduationCap,
-    },
-    {
-      institution: "SMKN 1 Cikarang Barat",
-      location: "Bekasi, Indonesia",
-      degree: "Teknik Komputer dan Jaringan (TKJ)",
-      period: "2020 – 2023",
-      grade: "Rata-rata Nilai: 80.6 / 100",
-      description: "Lulusan Peringkat 4 Besar.",
-      icon: Laptop,
-    },
-  ];
-
-  const EXPERIENCES = [
-    {
-      company: "PT Berkah Teknologi Terdepan",
-      role: "Junior Software Engineer (Intern)",
-      period: "2026",
-      type: "Internship",
-      details: [
-        "Mengembangkan dan mengimplementasikan fitur full-stack web yang responsif untuk meningkatkan fungsionalitas sistem dan pengalaman pengguna secara menyeluruh.",
-        "Melakukan pengujian komprehensif (unit & integration testing) serta debugging proaktif untuk memastikan stabilitas sistem dan kinerja aplikasi yang optimal di lingkungan production.",
-      ],
-    },
-    {
-      company: "Pop Survey",
-      role: "Campus Ambassador",
-      period: "2026 – Sekarang",
-      type: "Ambassador",
-      details: [
-        "Mewakili brand Pop Survey dalam membangun awareness dan engagement di lingkungan kampus melalui aktivasi program strategis.",
-        "Memfasilitasi pengumpulan data riset mahasiswa serta berperan aktif dalam mengomunikasikan nilai tambah platform kepada komunitas pengguna di universitas.",
-      ],
-    },
-    {
-      company: "Google Student Ambassador (GSA)",
-      role: "Perwakilan Universitas",
-      period: "2026 – Sekarang",
-      type: "Official Role",
-      details: [
-        "Menjadi jembatan komunikasi resmi antara Google dan komunitas kampus untuk mengenalkan inovasi teknologi dan program developer kepada mahasiswa.",
-        "Mengoordinasikan aktivasi komunitas dan terpilih sebagai perwakilan universitas dalam rangkaian Inauguration & Office Tour di Kantor Google Jakarta.",
-      ],
-    },
-    {
-      company: "Asisten Laboratorium",
-      role: "Pengajar Praktikum Pemrograman 1 (Java)",
-      period: "2026",
-      type: "Academic Staff",
-      details: [
-        "Membimbing dan menginstruksikan implementasi logika pemrograman dasar, algoritma, dan struktur data menggunakan bahasa Java kepada mahasiswa secara intensif.",
-        "Mengelola kelas praktikum, menyusun modul evaluasi, dan membantu mahasiswa menyelesaikan kendala eror (debugging) pada kode program.",
-      ],
-    },
-    {
-      company: "Asisten Dosen",
-      role: "Penguji Mata Kuliah Internet Teknologi Web (ITW)",
-      period: "2025",
-      type: "Academic Staff",
-      details: [
-        "Membimbing serta mengevaluasi kompetensi teknis pengerjaan tugas besar berbasis Web (HTML, CSS, PHP) terhadap 10 mahasiswa dalam dua sesi pengujian mendalam.",
-        "Memberikan penilaian objektif terkait arsitektur kode, fungsionalitas aplikasi web, dan integrasi basis data.",
-      ],
-    },
-    {
-      company: "PT Suzuki Sejahtera Buana Trada",
-      role: "Asisten IT (Magang)",
-      period: "Jan 2022 – Mar 2022",
-      type: "Internship",
-      details: [
-        "Bertanggung jawab atas pemeliharaan rutin perangkat keras komputer (hardware maintenance), instalasi sistem operasi, dan pemecahan masalah jaringan internal.",
-        "Melakukan migrasi data pengguna secara aman untuk memastikan stabilitas operasional IT dan meminimalkan downtime perusahaan.",
-      ],
-    },
-  ];
 
   return (
     <div
@@ -267,32 +282,50 @@ const AboutPage = () => {
             </h2>
 
             <p className="text-base sm:text-lg text-slate-600 leading-relaxed text-justify font-normal">
-              Mahasiswa Teknik Informatika Universitas Pasundan (Semester 4) dengan latar belakang SMK Teknik Komputer dan Jaringan (TKJ). Berdedikasi tinggi mengombinasikan keunggulan akademik selaku Penerima Beasiswa KIP-Kuliah (IPK 3.76/4.00) dengan sertifikasi kompetensi IT Support & Jaringan dari BNSP. Memiliki pengalaman praktis dalam pengembangan aplikasi Java GUI, full-stack web development (PHP & MySQL), manajemen infrastruktur Cisco, serta aktif sebagai Google Student Ambassador 2026.
+              Detail-oriented Informatics Engineering undergraduate at Universitas Pasundan (GPA 3.76/4.00, KIP-Kuliah Scholar) and BNSP-certified Computer and Network Technician with practical experience in full-stack web development, software quality assurance, and network infrastructure. Proven ability to deliver scalable web & cloud solutions, mentor peers in Java and web technologies, and drive tech community engagement as a Google Student Ambassador and GDGoC Core Team member.
             </p>
+
+            {/* Quick Contact & Location Pill Bar from CV */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 text-xs font-semibold text-slate-600">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 border border-slate-200 shadow-xs">
+                <MapPin className="w-3.5 h-3.5 text-sky-600" />
+                Bandung, West Java, Indonesia
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/85 border border-slate-200 shadow-xs">
+                <Laptop className="w-3.5 h-3.5 text-emerald-600" />
+                billywicaksono.999@gmail.com
+              </span>
+            </div>
 
             {/* Quote Card */}
             <div className="relative glass-card border border-sky-200/80 rounded-2xl p-5 my-6 backdrop-blur-xl shadow-md overflow-hidden" data-aos="fade-up">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-400/10 to-transparent rounded-bl-full pointer-events-none"></div>
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-sky-400/10 to-transparent rounded-bl-full pointer-events-none" />
               <blockquote className="text-slate-700 text-center lg:text-left italic font-semibold text-sm sm:text-base leading-relaxed">
-                "Disiplin, berorientasi pada solusi, dan memadukan keunggulan akademis dengan pengalaman praktis IT."
+                "Detail-oriented, disciplined, and committed to delivering scalable technical solutions while empowering developer communities."
               </blockquote>
             </div>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 w-full pt-2">
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 w-full pt-2">
               <a
                 href="/CV Billy Wicaksono.pdf"
                 download="CV_Billy_Wicaksono.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="w-full sm:w-auto"
               >
                 <button className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-gradient-to-r from-[#0284c7] via-[#0d9488] to-[#059669] text-white font-extrabold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 shadow-lg shadow-sky-500/20 active:scale-95">
-                  <FileText className="w-5 h-5" /> Download Official CV
+                  <Download className="w-5 h-5" /> Download Latest CV
                 </button>
               </a>
 
+              <button
+                type="button"
+                onClick={() => setShowCvModal(true)}
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl glass-card border border-sky-300 text-sky-800 font-extrabold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 hover:bg-sky-50/90 active:scale-95 shadow-sm"
+              >
+                <Eye className="w-5 h-5" /> Preview CV
+              </button>
+
               <a href="#Portofolio" className="w-full sm:w-auto">
-                <button className="w-full sm:w-auto px-6 py-3.5 rounded-xl glass-card border border-emerald-300 text-emerald-800 font-extrabold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 hover:bg-emerald-50/80 active:scale-95 shadow-sm">
+                <button className="w-full sm:w-auto px-5 py-3.5 rounded-xl glass-card border border-emerald-300 text-emerald-800 font-extrabold transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 hover:bg-emerald-50/80 active:scale-95 shadow-sm">
                   <Code className="w-5 h-5" /> View Projects
                 </button>
               </a>
@@ -317,10 +350,10 @@ const AboutPage = () => {
             </div>
             <div>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Pendidikan (Education)
+                Education
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Riwayat akademis & kualifikasi pendidikan formal
+                Academic background & scholarships
               </p>
             </div>
           </div>
@@ -329,11 +362,11 @@ const AboutPage = () => {
             {EDUCATION.map((edu, idx) => (
               <div
                 key={idx}
-                className="glass-card border border-slate-200/90 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-sky-300 transition-all duration-300 relative overflow-hidden group flex flex-col justify-between"
+                className="glass-card glass-card-hover border border-slate-200/90 rounded-2xl p-6 shadow-md relative overflow-hidden group flex flex-col justify-between"
               >
                 <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-bl from-sky-100/60 to-transparent rounded-bl-full pointer-events-none" />
                 <div className="space-y-3.5">
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5" /> {edu.period}
                     </span>
@@ -364,7 +397,7 @@ const AboutPage = () => {
           </div>
         </div>
 
-        {/* PROFESSIONAL EXPERIENCES SECTION */}
+        {/* WORK & TEACHING EXPERIENCES */}
         <div className="mt-20 space-y-8" data-aos="fade-up">
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-2xl bg-emerald-100/80 text-emerald-700 border border-emerald-200/80 shadow-sm">
@@ -372,19 +405,21 @@ const AboutPage = () => {
             </div>
             <div>
               <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Pengalaman Profesional (Work Experience)
+                Work & Teaching Experience
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Pengalaman kerja, magang, ambassador, serta asisten akademik & laboratorium
+                Software engineering internships, laboratory instruction & IT support
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {EXPERIENCES.map((exp, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {WORK_EXPERIENCES.map((exp, idx) => (
               <div
                 key={idx}
-                className="glass-card border border-slate-200/90 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-sky-300 transition-all duration-300 flex flex-col justify-between group"
+                data-aos="fade-up"
+                data-aos-delay={idx * 80}
+                className="glass-card glass-card-hover border border-slate-200/90 rounded-2xl p-6 shadow-md flex flex-col justify-between group"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between gap-2">
@@ -418,7 +453,136 @@ const AboutPage = () => {
             ))}
           </div>
         </div>
+
+        {/* ORGANIZATIONAL & LEADERSHIP EXPERIENCE */}
+        <div className="mt-20 space-y-8" data-aos="fade-up">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-2xl bg-sky-100/80 text-sky-700 border border-sky-200/80 shadow-sm">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                Organizational & Leadership
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                Developer community leadership & university ambassador initiatives
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {ORGANIZATIONS.map((org, idx) => (
+              <div
+                key={idx}
+                data-aos="fade-up"
+                data-aos-delay={idx * 90}
+                className="glass-card glass-card-hover border border-slate-200/90 rounded-2xl p-6 shadow-md flex flex-col justify-between group"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold">
+                      {org.tag}
+                    </span>
+                    <span className="text-xs font-bold text-slate-500">
+                      {org.period}
+                    </span>
+                  </div>
+                  <h4 className="text-base font-extrabold text-slate-900 group-hover:text-sky-600 transition-colors leading-snug">
+                    {org.role}
+                  </h4>
+                  <p className="text-xs font-bold text-sky-700">{org.organization}</p>
+                  <p className="text-xs text-slate-600 leading-relaxed pt-2 border-t border-slate-100">
+                    {org.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CERTIFICATIONS & ACHIEVEMENTS HIGHLIGHT STRIP */}
+        <div className="mt-20 space-y-6" data-aos="fade-up">
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-2xl bg-amber-100/80 text-amber-700 border border-amber-200/80 shadow-sm">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                Certifications & Achievements
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+                National technical certifications, language credentials & championship honors
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            {CERTIFICATIONS_LIST.map((item, idx) => (
+              <div
+                key={idx}
+                data-aos="zoom-in"
+                data-aos-delay={idx * 60}
+                className="glass-card glass-card-hover rounded-2xl p-4 border border-slate-200/90 flex flex-col justify-between gap-2"
+              >
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500/15 to-emerald-500/15 border border-sky-200 flex items-center justify-center text-sky-700">
+                  <Award className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-xs font-extrabold text-slate-900 leading-snug">
+                    {item.title}
+                  </p>
+                  <p className="text-[11px] font-semibold text-emerald-700 mt-1">
+                    {item.issuer}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {/* CV PREVIEW MODAL */}
+      {showCvModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn"
+          onClick={() => setShowCvModal(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl h-[85vh] bg-white rounded-3xl border border-slate-200 shadow-2xl overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-slate-50">
+              <div className="flex items-center gap-2.5">
+                <FileText className="w-5 h-5 text-sky-600" />
+                <h3 className="font-extrabold text-slate-900 text-sm sm:text-base">
+                  Curriculum Vitae — Billy Wicaksono
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href="/CV Billy Wicaksono.pdf"
+                  download="CV_Billy_Wicaksono.pdf"
+                  className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-[#0284c7] to-[#059669] text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:opacity-95"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download PDF
+                </a>
+                <button
+                  onClick={() => setShowCvModal(false)}
+                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-800 hover:bg-slate-200/70 transition-colors"
+                  aria-label="Close Preview"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <iframe
+              src="/CV Billy Wicaksono.pdf"
+              title="CV Billy Wicaksono"
+              className="w-full flex-1 border-0 bg-slate-100"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

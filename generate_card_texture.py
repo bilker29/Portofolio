@@ -2,253 +2,255 @@ import os
 import qrcode
 from PIL import Image, ImageDraw, ImageFont
 
+def get_font(path, size):
+    try:
+        return ImageFont.truetype(path, size)
+    except Exception:
+        return ImageFont.load_default()
+
+def draw_gradient_panel(draw, w, h, top_rgb, bot_rgb):
+    for y in range(h):
+        ratio = y / max(1, h - 1)
+        r = int(top_rgb[0] + (bot_rgb[0] - top_rgb[0]) * ratio)
+        g = int(top_rgb[1] + (bot_rgb[1] - top_rgb[1]) * ratio)
+        b = int(top_rgb[2] + (bot_rgb[2] - top_rgb[2]) * ratio)
+        draw.line([(0, y), (w, y)], fill=(r, g, b, 255))
+
+def draw_hud_corners(draw, x1, y1, x2, y2, length=24, color=(56, 189, 248, 255), width=3):
+    draw.line([(x1, y1), (x1 + length, y1)], fill=color, width=width)
+    draw.line([(x1, y1), (x1, y1 + length)], fill=color, width=width)
+    draw.line([(x2 - length, y1), (x2, y1)], fill=color, width=width)
+    draw.line([(x2, y1), (x2, y1 + length)], fill=color, width=width)
+    draw.line([(x1, y2), (x1 + length, y2)], fill=color, width=width)
+    draw.line([(x1, y2 - length), (x1, y2)], fill=color, width=width)
+    draw.line([(x2 - length, y2), (x2, y2)], fill=color, width=width)
+    draw.line([(x2, y2 - length), (x2, y2)], fill=color, width=width)
+
 def create_card_texture():
     width, height = 1024, 1024
-    base = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-    
+    # Fill entire canvas with deep midnight ocean navy so bevels/edges never show white/black gaps
+    base = Image.new("RGBA", (width, height), (8, 20, 38, 255))
+
     font_bold = "C:/Windows/Fonts/segoeuib.ttf"
     font_reg = "C:/Windows/Fonts/segoeui.ttf"
     font_arial_b = "C:/Windows/Fonts/arialbd.ttf"
-    
-    def get_font(path, size):
-        try:
-            return ImageFont.truetype(path, size)
-        except:
-            return ImageFont.load_default()
 
-    f_title = get_font(font_arial_b, 46)
-    f_sub = get_font(font_bold, 24)
-    f_body = get_font(font_bold, 18)
+    f_title = get_font(font_arial_b, 50)
+    f_name = get_font(font_bold, 25)
+    f_sub = get_font(font_reg, 15)
+    f_body = get_font(font_bold, 19)
     f_sm = get_font(font_bold, 13)
     f_xs = get_font(font_bold, 11)
     f_badge = get_font(font_bold, 13)
     f_large = get_font(font_bold, 30)
 
-    # ─────────────────────────────────────────────────────────────────────────
-    # 1. FRONT CARD (x: 25 to 486, y: 19 to 756)
-    # ─────────────────────────────────────────────────────────────────────────
-    fx1, fy1, fx2, fy2 = 25, 19, 486, 756
-    card_w = fx2 - fx1
-    card_h = fy2 - fy1
+    # Exact GLB UV map (with flipY = false):
+    # Front face covers U: 0.000..0.500 (x: 0..512), V: 0.000..0.757 (y: 0..776)
+    # Back face covers  U: 0.500..1.000 (x: 512..1024), V: 0.000..0.757 (y: 0..776)
+    face_w, face_h = 512, 776
 
-    front_im = Image.new("RGBA", (card_w, card_h), (0, 0, 0, 0))
+    # ─────────────────────────────────────────────────────────────────────────
+    # 1. FRONT FACE (x: 0..512, y: 0..776)
+    # ─────────────────────────────────────────────────────────────────────────
+    front_im = Image.new("RGBA", (face_w, face_h), (8, 20, 38, 255))
+    fdraw = ImageDraw.Draw(front_im)
+    draw_gradient_panel(fdraw, face_w, face_h, (8, 22, 42), (10, 32, 60))
+
+    # Subtle ambient glow circle at top-right & bottom-left
+    glow = Image.new("RGBA", (face_w, face_h), (0, 0, 0, 0))
+    gdraw = ImageDraw.Draw(glow)
+    gdraw.ellipse([(260, -80), (580, 240)], fill=(14, 165, 233, 45))
+    gdraw.ellipse([(-100, 520), (240, 860)], fill=(16, 185, 129, 35))
+    front_im = Image.alpha_composite(front_im, glow)
     fdraw = ImageDraw.Draw(front_im)
 
-    # Deep dark tech blue gradient
-    for y in range(card_h):
-        ratio = y / card_h
-        r = int(8 + ratio * 6)
-        g = int(16 + ratio * 10)
-        b = int(32 + ratio * 16)
-        fdraw.line([(0, y), (card_w, y)], fill=(r, g, b, 255))
+    # Dot tech matrix
+    for x in range(28, face_w - 20, 22):
+        for y in range(28, face_h - 20, 22):
+            fdraw.point((x, y), fill=(56, 189, 248, 55))
 
-    # Dot grid
-    for x in range(20, card_w, 24):
-        for y in range(20, card_h, 24):
-            fdraw.point((x, y), fill=(14, 165, 233, 50))
+    # Crisp inner HUD card border
+    fdraw.rounded_rectangle([(14, 14), (face_w - 14, face_h - 14)], radius=20, outline=(56, 189, 248, 170), width=2)
+    draw_hud_corners(fdraw, 22, 22, face_w - 22, face_h - 22, length=24, color=(56, 189, 248, 240), width=3)
 
-    # Outer border
-    fdraw.rounded_rectangle([(8, 8), (card_w - 8, card_h - 8)], radius=18, outline=(14, 165, 233, 180), width=2)
+    # Top header row (kept strictly clear of center clip/clamp zone x=210..302, y=0..76)
+    fdraw.rounded_rectangle([(28, 32), (124, 58)], radius=8, fill=(14, 52, 92, 255), outline=(56, 189, 248, 255), width=2)
+    fdraw.text((76, 45), "JUNIOR", font=f_badge, fill=(125, 211, 252, 255), anchor="mm")
 
-    # Corner brackets (Tech HUD style)
-    c_len = 24
-    c_color = (56, 189, 248, 240)
-    # TL
-    fdraw.line([(12, 12), (12 + c_len, 12)], fill=c_color, width=2)
-    fdraw.line([(12, 12), (12, 12 + c_len)], fill=c_color, width=2)
-    # TR
-    fdraw.line([(card_w - 12 - c_len, 12), (card_w - 12, 12)], fill=c_color, width=2)
-    fdraw.line([(card_w - 12, 12), (card_w - 12, 12 + c_len)], fill=c_color, width=2)
-    # BL
-    fdraw.line([(12, card_h - 12), (12 + c_len, card_h - 12)], fill=c_color, width=2)
-    fdraw.line([(12, card_h - 12 - c_len), (12, card_h - 12)], fill=c_color, width=2)
-    # BR
-    fdraw.line([(card_w - 12 - c_len, card_h - 12), (card_w - 12, card_h - 12)], fill=c_color, width=2)
-    fdraw.line([(card_w - 12, card_h - 12 - c_len), (card_w - 12, card_h - 12)], fill=c_color, width=2)
+    fdraw.text((face_w - 28, 34), "UNPAS BANDUNG", font=f_xs, fill=(241, 245, 249, 255), anchor="ra")
+    fdraw.text((face_w - 28, 50), "GDGoC • GSA 2026", font=f_xs, fill=(52, 211, 153, 255), anchor="ra")
 
-    # Top slot cutout line indicator
-    fdraw.rounded_rectangle([(card_w // 2 - 32, 16), (card_w // 2 + 32, 24)], radius=4, fill=(15, 23, 42, 255), outline=(14, 165, 233, 140), width=1)
+    # Main Title: DEVELOPER
+    fdraw.text((28, 86), "DEV", font=f_title, fill=(255, 255, 255, 255))
+    fdraw.text((132, 86), "ELOPER", font=f_title, fill=(56, 189, 248, 255))
 
-    # Badge: JUNIOR
-    fdraw.rounded_rectangle([(24, 34), (105, 58)], radius=6, fill=(14, 165, 233, 40), outline=(56, 189, 248, 220), width=1)
-    fdraw.text((36, 38), "JUNIOR", font=f_badge, fill=(56, 189, 248, 255))
+    # Certified Tag right beside title
+    fdraw.rounded_rectangle([(face_w - 140, 94), (face_w - 28, 120)], radius=12, fill=(10, 56, 54, 255), outline=(52, 211, 153, 255), width=2)
+    fdraw.text((face_w - 84, 107), "BNSP CERTIFIED", font=get_font(font_bold, 10), fill=(167, 243, 208, 255), anchor="mm")
 
-    # University right aligned
-    fdraw.text((card_w - 24, 32), "UNPAS BANDUNG", font=f_xs, fill=(241, 245, 249, 255), anchor="ra")
-    fdraw.text((card_w - 24, 46), "SMKN 1 CIKARANG BRT", font=f_xs, fill=(148, 163, 184, 220), anchor="ra")
-
-    # Large DEVELOPER Title
-    fdraw.text((24, 68), "DEV", font=f_title, fill=(255, 255, 255, 255))
-    fdraw.text((120, 68), "ELOPER", font=f_title, fill=(56, 189, 248, 255))
-
-    # GSA 2026 Badge
-    fdraw.rounded_rectangle([(card_w - 110, 74), (card_w - 24, 98)], radius=12, fill=(16, 185, 129, 35), outline=(16, 185, 129, 220), width=1)
-    fdraw.text((card_w - 67, 80), "* GSA 2026", font=f_xs, fill=(16, 185, 129, 255), anchor="ma")
-
-    # Photo section
-    photo_box = (24, 126, 304, 406)
-    photo_w = photo_box[2] - photo_box[0]
-    photo_h = photo_box[3] - photo_box[1]
+    # Photo Box (square aspect, crisp frame)
+    photo_box = (28, 150, 340, 462)
+    pw_box = photo_box[2] - photo_box[0]
+    ph_box = photo_box[3] - photo_box[1]
 
     photo_path = "d:/Portofolio/public/Photo.jpg"
     if os.path.exists(photo_path):
-        try:
-            user_photo = Image.open(photo_path).convert("RGBA")
-            pw, ph = user_photo.size
-            min_dim = min(pw, ph)
-            crop_x = (pw - min_dim) // 2
-            crop_y = (ph - min_dim) // 2
-            user_photo = user_photo.crop((crop_x, crop_y, crop_x + min_dim, crop_y + min_dim))
-            user_photo = user_photo.resize((photo_w, photo_h), Image.Resampling.LANCZOS)
-            
-            mask = Image.new("L", (photo_w, photo_h), 0)
-            ImageDraw.Draw(mask).rounded_rectangle([(0, 0), (photo_w, photo_h)], radius=12, fill=255)
-            front_im.paste(user_photo, (photo_box[0], photo_box[1]), mask)
-        except Exception as e:
-            print("Photo load error:", e)
+        user_photo = Image.open(photo_path).convert("RGBA")
+        pw, ph = user_photo.size
+        min_dim = min(pw, ph)
+        crop_x = (pw - min_dim) // 2
+        crop_y = (ph - min_dim) // 2
+        user_photo = user_photo.crop((crop_x, crop_y, crop_x + min_dim, crop_y + min_dim))
+        user_photo = user_photo.resize((pw_box, ph_box), Image.Resampling.LANCZOS)
 
-    fdraw.rounded_rectangle([photo_box[0], photo_box[1], photo_box[2], photo_box[3]], radius=12, outline=(56, 189, 248, 160), width=2)
+        mask = Image.new("L", (pw_box, ph_box), 0)
+        ImageDraw.Draw(mask).rounded_rectangle([(0, 0), (pw_box, ph_box)], radius=16, fill=255)
+        front_im.paste(user_photo, (photo_box[0], photo_box[1]), mask)
 
-    # VERIFIED ID Bar
-    fdraw.rounded_rectangle([(photo_box[0] + 6, photo_box[3] - 28), (photo_box[0] + 130, photo_box[3] - 6)], radius=6, fill=(10, 18, 32, 240), outline=(16, 185, 129, 220), width=1)
-    fdraw.ellipse([(photo_box[0] + 16, photo_box[3] - 20), (photo_box[0] + 24, photo_box[3] - 12)], fill=(16, 185, 129, 255))
-    fdraw.text((photo_box[0] + 30, photo_box[3] - 22), "VERIFIED ID", font=f_xs, fill=(16, 185, 129, 255))
+    fdraw.rounded_rectangle([photo_box[0], photo_box[1], photo_box[2], photo_box[3]], radius=16, outline=(56, 189, 248, 200), width=3)
 
-    # Right Sidebar next to photo: "TEKNIK INFORMATIKA" (vertical text)
-    sidebar_x = photo_box[2] + 12
-    sidebar_w = card_w - 24 - sidebar_x
-    fdraw.rounded_rectangle([(sidebar_x, photo_box[1]), (card_w - 24, photo_box[3])], radius=10, fill=(10, 22, 40, 200), outline=(14, 165, 233, 90), width=1)
-    
-    v_text = "TEKNIK INFORMATIKA"
-    vert_im = Image.new("RGBA", (photo_h, sidebar_w), (0, 0, 0, 0))
+    # VERIFIED ID Floating Pill on Photo
+    fdraw.rounded_rectangle([(photo_box[0] + 10, photo_box[3] - 34), (photo_box[0] + 148, photo_box[3] - 10)], radius=8, fill=(8, 18, 34, 255), outline=(52, 211, 153, 255), width=2)
+    fdraw.ellipse([(photo_box[0] + 20, photo_box[3] - 26), (photo_box[0] + 28, photo_box[3] - 18)], fill=(16, 185, 129, 255))
+    fdraw.text((photo_box[0] + 36, photo_box[3] - 22), "VERIFIED ID", font=f_xs, fill=(110, 231, 183, 255), anchor="lm")
+
+    # Vertical Sidebar beside photo: TEKNIK INFORMATIKA
+    sidebar_x = photo_box[2] + 14
+    sidebar_x2 = face_w - 28
+    sidebar_w = sidebar_x2 - sidebar_x
+    fdraw.rounded_rectangle([(sidebar_x, photo_box[1]), (sidebar_x2, photo_box[3])], radius=14, fill=(12, 30, 56, 255), outline=(56, 189, 248, 170), width=2)
+
+    vert_im = Image.new("RGBA", (ph_box, sidebar_w), (0, 0, 0, 0))
     vdraw = ImageDraw.Draw(vert_im)
-    vdraw.text((photo_h // 2, sidebar_w // 2), v_text, font=get_font(font_arial_b, 17), fill=(56, 189, 248, 255), anchor="mm")
-    vert_rotated = vert_im.rotate(90, expand=True)
-    front_im.paste(vert_rotated, (sidebar_x + (sidebar_w - vert_rotated.width) // 2, photo_box[1] + (photo_h - vert_rotated.height) // 2), vert_rotated)
+    vdraw.text((ph_box // 2, sidebar_w // 2), "TEKNIK INFORMATIKA", font=get_font(font_arial_b, 20), fill=(125, 211, 252, 255), anchor="mm")
+    vert_rot = vert_im.rotate(90, expand=True)
+    front_im.paste(vert_rot, (sidebar_x + (sidebar_w - vert_rot.width) // 2, photo_box[1] + (ph_box - vert_rot.height) // 2), vert_rot)
 
-    # Name plate section (dark contrast navy background)
-    name_y = 420
-    fdraw.rounded_rectangle([(24, name_y), (card_w - 24, name_y + 66)], radius=12, fill=(10, 22, 42, 240), outline=(56, 189, 248, 120), width=1)
-    fdraw.text((38, name_y + 10), "BILLY WICAKSONO", font=f_sub, fill=(255, 255, 255, 255))
-    # Verified badge circle
-    fdraw.ellipse([(268, name_y + 16), (286, name_y + 34)], fill=(14, 165, 233, 255))
-    fdraw.line([(273, name_y + 25), (276, name_y + 29)], fill=(255, 255, 255, 255), width=2)
-    fdraw.line([(276, name_y + 29), (282, name_y + 21)], fill=(255, 255, 255, 255), width=2)
-    fdraw.text((38, name_y + 38), "S1 Informatics • IPK 3.76 (KIP-K)", font=f_sm, fill=(148, 163, 184, 255))
+    # Nameplate Box
+    name_y = 480
+    fdraw.rounded_rectangle([(28, name_y), (face_w - 28, name_y + 72)], radius=14, fill=(12, 28, 52, 255), outline=(56, 189, 248, 190), width=2)
+    fdraw.text((44, name_y + 12), "BILLY WICAKSONO", font=f_name, fill=(255, 255, 255, 255))
+    # Verified check icon
+    fdraw.ellipse([(282, name_y + 18), (302, name_y + 38)], fill=(14, 165, 233, 255))
+    fdraw.line([(287, name_y + 28), (291, name_y + 32), (298, name_y + 23)], fill=(255, 255, 255, 255), width=2)
+    fdraw.text((44, name_y + 44), "Software Engineer & IT Infrastructure", font=f_sub, fill=(186, 230, 253, 255))
 
-    # Stat Badges (IPK, SEMESTER, BNSP)
-    badge_y = 498
-    col_w = (card_w - 48 - 16) // 3
-    badges_info = [("IPK", "3.76"), ("SEMESTER", "4"), ("SERTIFIKASI", "BNSP IT")]
-    for i, (blabel, bval) in enumerate(badges_info):
-        bx = 24 + i * (col_w + 8)
-        fdraw.rounded_rectangle([(bx, badge_y), (bx + col_w, badge_y + 50)], radius=8, fill=(10, 20, 38, 230), outline=(14, 165, 233, 90), width=1)
-        fdraw.text((bx + col_w // 2, badge_y + 15), bval, font=f_body, fill=(56, 189, 248, 255), anchor="mm")
-        fdraw.text((bx + col_w // 2, badge_y + 35), blabel, font=f_xs, fill=(148, 163, 184, 220), anchor="mm")
+    # 3 KPI Pills Row
+    stat_y = 568
+    col_w = (face_w - 56 - 20) // 3
+    stats = [("IPK", "3.76"), ("BEASISWA", "KIP-K"), ("CLUB", "GDGoC PR")]
+    for i, (lbl, val) in enumerate(stats):
+        bx = 28 + i * (col_w + 10)
+        fdraw.rounded_rectangle([(bx, stat_y), (bx + col_w, stat_y + 58)], radius=10, fill=(10, 24, 46, 255), outline=(56, 189, 248, 160), width=2)
+        fdraw.text((bx + col_w // 2, stat_y + 20), val, font=f_body, fill=(56, 189, 248, 255), anchor="mm")
+        fdraw.text((bx + col_w // 2, stat_y + 43), lbl, font=f_xs, fill=(148, 163, 184, 255), anchor="mm")
 
-    # Bottom PORTFOLIO strip
-    strip_y = 560
-    fdraw.rounded_rectangle([(24, strip_y), (card_w - 24, strip_y + 40)], radius=8, fill=(14, 165, 233, 35), outline=(56, 189, 248, 140), width=1)
-    fdraw.text((card_w // 2, strip_y + 20), "PORTFOLIO • UNIVERSITAS PASUNDAN", font=f_badge, fill=(255, 255, 255, 255), anchor="mm")
+    # Portfolio Gradient Strip
+    strip_y = 642
+    fdraw.rounded_rectangle([(28, strip_y), (face_w - 28, strip_y + 44)], radius=10, fill=(14, 62, 108, 255), outline=(56, 189, 248, 255), width=2)
+    fdraw.text((face_w // 2, strip_y + 22), "PORTFOLIO  •  UNIVERSITAS PASUNDAN", font=f_badge, fill=(255, 255, 255, 255), anchor="mm")
 
-    # Quote footer
-    fdraw.text((card_w // 2, 620), "Don't repeat yourself — Code Clean, Think Bigger", font=f_xs, fill=(148, 163, 184, 220), anchor="mm")
-    fdraw.text((card_w // 2, 640), "billywicaksono.com", font=f_xs, fill=(56, 189, 248, 200), anchor="mm")
+    # Quote Footer
+    fdraw.text((face_w // 2, 706), "Code Clean, Think Bigger — Continuous Excellence", font=f_xs, fill=(148, 163, 184, 230), anchor="mm")
+    fdraw.text((face_w // 2, 728), "github.com/bilker29  •  ID: BW-2026-04", font=f_xs, fill=(56, 189, 248, 220), anchor="mm")
 
-    base.paste(front_im, (fx1, fy1))
+    base.paste(front_im, (0, 0))
 
     # ─────────────────────────────────────────────────────────────────────────
-    # 2. BACK CARD (x: 537 to 998, y: 19 to 756)
+    # 2. BACK FACE (x: 512..1024, y: 0..776)
     # ─────────────────────────────────────────────────────────────────────────
-    bx1, by1, bx2, by2 = 537, 19, 998, 756
-    b_card_w = bx2 - bx1
-    b_card_h = by2 - by1
+    back_im = Image.new("RGBA", (face_w, face_h), (8, 20, 38, 255))
+    bdraw = ImageDraw.Draw(back_im)
+    draw_gradient_panel(bdraw, face_w, face_h, (6, 16, 32), (12, 28, 52))
 
-    back_im = Image.new("RGBA", (b_card_w, b_card_h), (0, 0, 0, 0))
+    # Diagonal geometric pattern
+    for i in range(-4, 22):
+        y_pos = i * 44
+        bdraw.line([(0, y_pos), (face_w, y_pos - 95)], fill=(56, 189, 248, 26), width=1)
+        bdraw.line([(0, y_pos), (face_w, y_pos + 95)], fill=(16, 185, 129, 22), width=1)
+
+    b_glow = Image.new("RGBA", (face_w, face_h), (0, 0, 0, 0))
+    bgdraw = ImageDraw.Draw(b_glow)
+    bgdraw.ellipse([(100, 140), (412, 450)], fill=(14, 165, 233, 35))
+    back_im = Image.alpha_composite(back_im, b_glow)
     bdraw = ImageDraw.Draw(back_im)
 
-    # Deep luxury dark navy
-    for y in range(b_card_h):
-        ratio = y / b_card_h
-        r = int(6 + ratio * 6)
-        g = int(12 + ratio * 10)
-        b = int(24 + ratio * 18)
-        bdraw.line([(0, y), (b_card_w, y)], fill=(r, g, b, 255))
+    bdraw.rounded_rectangle([(14, 14), (face_w - 14, face_h - 14)], radius=20, outline=(56, 189, 248, 170), width=2)
+    draw_hud_corners(bdraw, 22, 22, face_w - 22, face_h - 22, length=24, color=(52, 211, 153, 240), width=3)
 
-    # Circuit lines
-    b_color_dim = (14, 165, 233, 30)
-    for i in range(16):
-        y_pos = i * 46
-        bdraw.line([(0, y_pos), (b_card_w, y_pos - 80)], fill=b_color_dim, width=1)
-        bdraw.line([(0, y_pos), (b_card_w, y_pos + 80)], fill=b_color_dim, width=1)
+    # Top corner labels (keeping center x=210..302, y=0..76 clear for clip/clamp!)
+    bdraw.text((30, 38), "OFFICIAL ID", font=f_xs, fill=(56, 189, 248, 255))
+    bdraw.text((face_w - 30, 38), "VERIFIED 2026", font=f_xs, fill=(52, 211, 153, 255), anchor="ra")
 
-    # Outer border
-    bdraw.rounded_rectangle([(8, 8), (b_card_w - 8, b_card_h - 8)], radius=18, outline=(14, 165, 233, 180), width=2)
-    
-    # Corner brackets (Back)
-    bdraw.line([(12, 12), (12 + c_len, 12)], fill=c_color, width=2)
-    bdraw.line([(12, 12), (12, 12 + c_len)], fill=c_color, width=2)
-    bdraw.line([(b_card_w - 12 - c_len, 12), (b_card_w - 12, 12)], fill=c_color, width=2)
-    bdraw.line([(b_card_w - 12, 12), (b_card_w - 12, 12 + c_len)], fill=c_color, width=2)
-    bdraw.line([(12, b_card_h - 12), (12 + c_len, b_card_h - 12)], fill=c_color, width=2)
-    bdraw.line([(12, b_card_h - 12 - c_len), (12, b_card_h - 12)], fill=c_color, width=2)
-    bdraw.line([(b_card_w - 12 - c_len, b_card_h - 12), (b_card_w - 12, b_card_h - 12)], fill=c_color, width=2)
-    bdraw.line([(b_card_w - 12, b_card_h - 12 - c_len), (b_card_w - 12, b_card_h - 12)], fill=c_color, width=2)
+    # Header Name below clamp
+    bdraw.rounded_rectangle([(96, 82), (face_w - 96, 108)], radius=13, fill=(14, 52, 92, 255), outline=(56, 189, 248, 230), width=2)
+    bdraw.text((face_w // 2, 95), "PORTFOLIO CREDENTIAL CARD", font=f_xs, fill=(186, 230, 253, 255), anchor="mm")
 
-    # Top slot cutout
-    bdraw.rounded_rectangle([(b_card_w // 2 - 32, 16), (b_card_w // 2 + 32, 24)], radius=4, fill=(15, 23, 42, 255), outline=(14, 165, 233, 140), width=1)
+    bdraw.text((face_w // 2, 138), "BILLY WICAKSONO", font=f_large, fill=(255, 255, 255, 255), anchor="mm")
+    bdraw.text((face_w // 2, 168), "Software Engineer • IT Infrastructure Enthusiast", font=f_xs, fill=(148, 163, 184, 255), anchor="mm")
 
-    # Top Badge: OFFICIAL ID
-    bdraw.rounded_rectangle([(b_card_w // 2 - 110, 36), (b_card_w // 2 + 110, 60)], radius=12, fill=(14, 165, 233, 30), outline=(56, 189, 248, 160), width=1)
-    bdraw.text((b_card_w // 2, 48), "* OFFICIAL PORTFOLIO CARD *", font=f_xs, fill=(56, 189, 248, 255), anchor="mm")
-
-    # Name on back
-    bdraw.text((b_card_w // 2, 88), "BILLY WICAKSONO", font=f_large, fill=(255, 255, 255, 255), anchor="mm")
-    bdraw.text((b_card_w // 2, 116), "Junior Software Engineer & IT Support", font=f_sm, fill=(148, 163, 184, 255), anchor="mm")
-
-    # Real QR Code to Billy's GitHub
-    qr = qrcode.QRCode(version=1, box_size=5, border=2)
+    # Real QR Code -> github.com/bilker29
+    qr = qrcode.QRCode(version=1, box_size=6, border=2)
     qr.add_data("https://github.com/bilker29")
     qr.make(fit=True)
-    qr_img = qr.make_image(fill_color="#38bdf8", back_color="#07101f").convert("RGBA")
-    
-    qr_size = 180
+    qr_img = qr.make_image(fill_color="#38bdf8", back_color="#071324").convert("RGBA")
+    qr_size = 186
     qr_img = qr_img.resize((qr_size, qr_size), Image.Resampling.LANCZOS)
-    qr_x = (b_card_w - qr_size) // 2
-    qr_y = 146
-    
-    # QR Glow border
-    bdraw.rounded_rectangle([(qr_x - 8, qr_y - 8), (qr_x + qr_size + 8, qr_y + qr_size + 8)], radius=14, fill=(10, 20, 38, 255), outline=(56, 189, 248, 200), width=2)
+    qr_x = (face_w - qr_size) // 2
+    qr_y = 196
+
+    bdraw.rounded_rectangle([(qr_x - 10, qr_y - 10), (qr_x + qr_size + 10, qr_y + qr_size + 10)], radius=16, fill=(7, 19, 36, 255), outline=(56, 189, 248, 220), width=2)
     back_im.paste(qr_img, (qr_x, qr_y), qr_img)
 
-    # Scan me label
-    bdraw.text((b_card_w // 2, qr_y + qr_size + 22), "SCAN TO OPEN GITHUB PROFILE", font=f_xs, fill=(56, 189, 248, 255), anchor="mm")
-    bdraw.text((b_card_w // 2, qr_y + qr_size + 38), "github.com/bilker29", font=f_sm, fill=(241, 245, 249, 255), anchor="mm")
+    bdraw.text((face_w // 2, qr_y + qr_size + 26), "SCAN TO VIEW GITHUB REPOSITORY", font=f_xs, fill=(56, 189, 248, 255), anchor="mm")
+    bdraw.text((face_w // 2, qr_y + qr_size + 44), "https://github.com/bilker29", font=f_sm, fill=(241, 245, 249, 255), anchor="mm")
 
-    # Academic & Certification credentials panel (dark navy background)
-    panel_y = qr_y + qr_size + 58
-    bdraw.rounded_rectangle([(24, panel_y), (b_card_w - 24, panel_y + 114)], radius=12, fill=(10, 20, 38, 240), outline=(56, 189, 248, 120), width=1)
-    
-    cred_items = [
-        ("INSTITUTION", "Universitas Pasundan (UNPAS) Bandung"),
-        ("STUDY PROGRAM", "Teknik Informatika • Semester 4"),
-        ("ACADEMIC GPA", "IPK 3.76 / 4.00 (KIP-Kuliah Awardee)"),
-        ("CERTIFICATION", "BNSP IT Support & Cisco Networking"),
+    # Credentials Card matching latest CV
+    panel_y = qr_y + qr_size + 66
+    bdraw.rounded_rectangle([(28, panel_y), (face_w - 28, panel_y + 158)], radius=14, fill=(10, 22, 42, 255), outline=(56, 189, 248, 170), width=2)
+
+    creds = [
+        ("UNIV", "Universitas Pasundan (GPA 3.76/4.00)"),
+        ("INTERN", "PT Berkah Teknologi Terdepan (SWE)"),
+        ("TEACH", "Lab Asst Java & Web Tech Examiner"),
+        ("ORG", "GDGoC Core Team PR & Google GSA"),
+        ("CERTS", "LSP BNSP IT • TOEIC • Dicoding • DAN 1"),
     ]
-    for idx, (label, val) in enumerate(cred_items):
-        item_y = panel_y + 14 + idx * 24
-        bdraw.text((36, item_y), label + ":", font=f_xs, fill=(56, 189, 248, 255))
-        bdraw.text((150, item_y), val, font=f_xs, fill=(241, 245, 249, 255))
+    for idx, (lbl, val) in enumerate(creds):
+        yy = panel_y + 18 + idx * 27
+        bdraw.text((42, yy), lbl, font=f_xs, fill=(52, 211, 153, 255))
+        bdraw.text((104, yy), val, font=f_xs, fill=(241, 245, 249, 255))
 
-    # Social links & ID serial footer
-    bdraw.text((b_card_w // 2, panel_y + 132), "LinkedIn: billy-wicaksono-315898372", font=f_xs, fill=(148, 163, 184, 220), anchor="mm")
-    bdraw.text((b_card_w // 2, panel_y + 152), "ID: BW-2026-UNPAS-04 • ALL RIGHTS RESERVED", font=f_xs, fill=(100, 116, 139, 220), anchor="mm")
+    # Footer on Back
+    bdraw.text((face_w // 2, panel_y + 180), "billywicaksono.999@gmail.com  •  Bandung, ID", font=f_xs, fill=(148, 163, 184, 240), anchor="mm")
+    bdraw.text((face_w // 2, panel_y + 202), "BW-2026-UNPAS  •  VERIFIED PORTFOLIO PASS", font=f_xs, fill=(56, 189, 248, 220), anchor="mm")
 
-    base.paste(back_im, (bx1, by1))
+    base.paste(back_im, (face_w, 0))
 
-    output_path = "d:/Portofolio/public/assets/card_custom.png"
-    base.save(output_path, "PNG")
-    print(f"Texture saved successfully to {output_path} (size: {width}x{height})")
+    output_card = "d:/Portofolio/public/assets/card_custom.png"
+    base.save(output_card, "PNG")
+    print(f"Saved {output_card}")
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # 3. CUSTOM LANYARD STRAP TEXTURE (1024 x 128) - clean, smooth, zero alias
+    # ─────────────────────────────────────────────────────────────────────────
+    bw, bh = 1024, 128
+    band_im = Image.new("RGBA", (bw, bh), (10, 24, 48, 255))
+    b_draw = ImageDraw.Draw(band_im)
+
+    # Woven dark-navy subtle pattern + glowing sky-blue side stripes
+    b_draw.rectangle([(0, 0), (bw, 10)], fill=(2, 132, 199, 255))
+    b_draw.rectangle([(0, bh - 10), (bw, bh)], fill=(13, 148, 136, 255))
+    b_draw.rectangle([(0, 12), (bw, 15)], fill=(56, 189, 248, 180))
+    b_draw.rectangle([(0, bh - 15), (bw, bh - 12)], fill=(52, 211, 153, 180))
+
+    band_font = get_font(font_arial_b, 42)
+    band_draw_text = "BILLY WICAKSONO   •   UNPAS"
+    b_draw.text((bw // 2, bh // 2), band_draw_text, font=band_font, fill=(248, 250, 252, 255), anchor="mm")
+
+    output_band = "d:/Portofolio/public/assets/band_custom.png"
+    band_im.save(output_band, "PNG")
+    print(f"Saved {output_band}")
 
 if __name__ == "__main__":
     create_card_texture()

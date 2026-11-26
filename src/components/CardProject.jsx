@@ -1,20 +1,31 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ExternalLink, ArrowRight, Sparkles } from "lucide-react";
+import { ExternalLink, ArrowRight } from "lucide-react";
+import Swal from "sweetalert2";
 import { toSlug } from "../utils/slug";
 
 const CardProject = ({ Img, Title, Description, Link: ProjectLink, id, TechStack = [] }) => {
   const handleLiveDemo = (e) => {
     if (!ProjectLink) {
       e.preventDefault();
-      alert("Live demo link is not available");
+      Swal.fire({
+        title: "Demo Belum Tersedia",
+        text: "Link live demo untuk proyek ini belum ditambahkan.",
+        icon: "info",
+        confirmButtonColor: "#0284c7",
+      });
     }
   };
 
   const handleDetails = (e) => {
     if (!id) {
       e.preventDefault();
-      alert("Project details are not available");
+      Swal.fire({
+        title: "Detail Belum Tersedia",
+        text: "Detail proyek ini belum tersedia.",
+        icon: "info",
+        confirmButtonColor: "#0284c7",
+      });
     }
   };
 

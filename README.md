@@ -12,7 +12,7 @@
 
 <br/>
 
-[🌟 Live Website](https://billy-wicaksono-website-portofolio.vercel.app/) • [📂 GitHub Repository](https://github.com/bilker29/Portofolio_V5.git) • [📄 Download CV](https://billywicaksono.com/CV%20Billy%20Wicaksono.pdf)
+[🌟 Live Website](https://billy-wicaksono-website-portofolio.vercel.app/) • [📂 GitHub Repository](https://github.com/bilker29/Portofolio.git) • [📄 Download CV](https://billy-wicaksono-website-portofolio.vercel.app/CV%20Billy%20Wicaksono.pdf)
 
 </div>
 
@@ -20,40 +20,36 @@
 
 ## 📌 Ringkasan Proyek (Overview)
 
-Website portofolio resmi **Billy Wicaksono**, Mahasiswa S1 Teknik Informatika di **Universitas Pasundan** (IPK 3.76/4.00, Penerima Beasiswa Penuh KIP-Kuliah), perwakilan aktif **Google Student Ambassador 2026**, serta bersertifikasi kompetensi **IT Support & Jaringan dari LSP BNSP**.
+Website portofolio resmi **Billy Wicaksono**, Mahasiswa S1 Teknik Informatika di **Universitas Pasundan** (IPK 3.76/4.00, Penerima Beasiswa Penuh KIP-Kuliah), **Google Student Ambassador 2026**, **Core Team GDGoC Universitas Pasundan (Public Relations)**, serta bersertifikasi kompetensi **Teknisi Komputer dan Jaringan – LSP BNSP**.
 
-Dibangun dengan arsitektur modern berbasis **React 18**, **Vite**, dan **Tailwind CSS**, portofolio ini dirancang untuk menyajikan rekayasa perangkat lunak, simulasi infrastruktur jaringan Cisco, sertifikasi profesional, dan galeri aktivitas dalam balutan antarmuka interaktif yang elegan, cepat, dan responsif.
+Dibangun dengan arsitektur modern berbasis **React 18**, **Vite**, **Three.js (React Three Fiber & Rapier)**, dan **Tailwind CSS**, portofolio ini dirancang untuk menyajikan rekayasa perangkat lunak full-stack, Web3 & AI, infrastruktur cloud AWS & Docker, simulasi jaringan Cisco, sertifikasi profesional, dan galeri aktivitas dalam antarmuka interaktif yang cepat, halus, dan responsif.
 
 ---
 
 ## ✨ Fitur Unggulan (Key Features)
 
-### 🪪 1. Interactive 3D Hanging ID Card (Lanyard Parallax)
-- **Physics Lanyard Suspension**: Menggantung secara realistis dengan tali lanyard tenun, buckle logam crimp, dan swivel carabiner ring.
-- **3D Parallax Tilt**: Kartu merespons pergerakan kursor mouse dan layar sentuh (*gyroscope-style 3D tilt*) dengan sumbu `rotateX` dan `rotateY`.
-- **Dynamic Holographic Sheen**: Refleksi cahaya holografik bergerak dinamis di permukaan kartu PVC mengikuti sudut pandang.
-- **Interactive 3D Card Flip**: Kartu dapat dibalik (*Front & Back*) secara interaktif dalam ruang 3D 360°, menampilkan barcode terenkripsi, QR Code resmi, detail akademik UNPAS, chip mikroprosesor, serta tanda tangan terverifikasi.
-- **Floating Tech Badges**: Badge melayang dengan animasi *gentle float* mengelilingi kartu ID (Java GUI, BNSP, Cisco, GSA 2026).
+### 🪪 1. Interactive 3D Physics ID Card (Three.js + Rapier)
+- **True 3D GLB & Rope Physics**: Menggunakan model 3D nyata (`kartu.glb`) dan tali lanyard dengan simulasi fisika tali *Rapier* (`useRopeJoint` & `useSphericalJoint`) berbasis **@react-three/fiber**.
+- **Transparent Studio Lighting**: Latar belakang transparan terintegrasi menyatu sempurna di atas mesh gradient website tanpa kotak buram.
+- **Free Drag & Pendulum Spin**: Tahan & geser kartu bebas ke segala arah atau klik **"Putar Kartu"** untuk memutar dan melihat sisi belakang beserta **QR Code GitHub aktif**.
+- **Floating Tech Badges**: Badge melayang dengan animasi *gentle float* mengelilingi kartu ID.
 
 ### ⏳ 2. Dynamic HUD Capsule Loading Screen (1% - 100%)
-- Desain kapsul *Dynamic Island HUD* futuristik bernuansa gelap obsidian dengan *dual glow aura* (Sky Blue & Emerald Green).
-- Counter persentase numerik animasi dari **1% hingga 100%** dengan easing non-linear yang mulus dan indikator cursor blok `█`.
-- Transisi keluar halus menggunakan **Framer Motion** (*blur dissolve & scale expansion*) saat website siap ditampilkan.
-- Dukungan opsi *instant skip* dengan klik cepat.
+- Desain kapsul HUD elegan bernuansa frosted glass *Soft Sky Blue & Emerald Mint*.
+- Counter persentase numerik animasi dari **1% hingga 100%** dengan easing mulus dan tombol *instant skip*.
 
-### 🎨 3. Vibrant Modern Glassmorphism Aesthetic
-- Palet warna cerah dan profesional dengan mesh gradient gradasi Sky Blue (`#0284c7`), Teal (`#0d9488`), dan Emerald Green (`#059669`).
-- Efek *frosted glass* (`backdrop-blur-xl`), border berpendar (*glow pulse*), dan marquee ganda untuk galeri kegiatan.
+### 🎵 3. Interactive Background Audio Player
+- Floating speaker widget di pojok kanan bawah yang memutar lagu **"Blue" – Yung Kai** lengkap dengan animasi piringan disc dan sound-wave visualizer.
 
-### 💻 4. Project Showcase & Technical Details
-- Menampilkan proyek unggulan seperti sistem desktop **Java GUI & MySQL (PUSTANI)**, perancangan topologi bandara **Cisco Packet Tracer (VLAN, OSPF, DHCP)**, dan aplikasi web responsif.
-- Dilengkapi modal detail proyek, tag arsitektur teknologi, serta tautan langsung ke *Live Demo* dan *GitHub Repository*.
+### 💻 4. Project Showcase & Latest Technical Works
+- **VERIDEX**: AI-Powered & Blockchain Verifiable Credentialing Platform (Next.js, Gemini 1.5 Flash, Solidity Monad Testnet).
+- **PUSTANI**: Agricultural Information Library & Cloud Infrastructure (AWS, Docker, Nginx, Java, PHP, MySQL, GitHub Actions CI/CD).
+- **Otty Sobat Siaga Banjir**: 2D Interactive Disaster Preparedness Game.
+- **Enterprise Network — Sentani Airport**: Simulasi VLAN, Inter-VLAN routing, DHCP & OSPF di Cisco Packet Tracer.
+- **E-Commerce Sales & Database System** & **University Library Management System**.
 
-### 📜 5. Verified Credentials & Certifications Lightbox
-- Pratinjau interaktif sertifikat resmi: **LSP BNSP IT Support**, **TOEIC English Proficiency**, dan penghargaan prestasi nasional Karate.
-
-### 💬 6. Real-time Guestbook & Comments
-- Sistem komentar dan interaksi pengunjung langsung yang terhubung ke basis data **Supabase PostgreSQL**.
+### 🔐 5. Admin Dashboard & Supabase CMS (`/login`)
+- Halaman admin terlindungi otentikasi Supabase (`/login` → `/dashboard`) untuk mengelola **Projects**, **Certificates**, **Activity Gallery**, serta **Guestbook Comments**.
 
 ---
 
@@ -120,7 +116,7 @@ Pastikan sistem Anda telah terpasang:
 
 ### 2. Kloning Repositori
 ```bash
-git clone https://github.com/bilker29/Portofolio_V5.git
+git clone https://github.com/bilker29/Portofolio.git
 cd Portofolio
 ```
 

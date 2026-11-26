@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Share2, User, Mail, MessageSquare, Send, Sparkles } from "lucide-react";
+import { Share2, User, Mail, MessageSquare, Send, Sparkles, MapPin, Phone } from "lucide-react";
 import SocialLinks from "../components/SocialLinks";
 import Komentar from "../components/Commentar";
 import Swal from "sweetalert2";
@@ -194,7 +194,28 @@ const ContactPage = () => {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-slate-100">
+            {/* Direct Contact Details from CV */}
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 pt-5 border-t border-slate-100">
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-sky-50/70 border border-sky-200/70">
+                <MapPin className="w-4 h-4 text-sky-600 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase text-slate-400">Location</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">Bandung, West Java, ID</p>
+                </div>
+              </div>
+              <a
+                href="tel:+6289510631734"
+                className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-50/70 border border-emerald-200/70 hover:bg-emerald-100/70 transition-colors"
+              >
+                <Phone className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase text-slate-400">Phone / WA</p>
+                  <p className="text-xs font-bold text-slate-800 truncate">+62 895-1063-1734</p>
+                </div>
+              </a>
+            </div>
+
+            <div className="mt-6 pt-5 border-t border-slate-100">
               <SocialLinks />
             </div>
           </div>

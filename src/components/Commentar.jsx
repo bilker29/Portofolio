@@ -12,15 +12,15 @@ import {
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import Swal from "sweetalert2";
 import { supabase } from "../supabase";
 
 const Comment = memo(({ comment, formatDate, index, isPinned = false }) => (
   <div
-    className={`px-4 pt-4 pb-2 rounded-xl border transition-all group hover:shadow-md hover:-translate-y-0.5 ${
-      isPinned
-        ? "bg-gradient-to-r from-emerald-50 to-sky-50 border-emerald-300 shadow-sm"
-        : "bg-slate-50/90 border-slate-200 hover:bg-white"
-    }`}
+    className={`px-4 pt-4 pb-2 rounded-xl border transition-all group hover:shadow-md hover:-translate-y-0.5 ${isPinned
+      ? "bg-gradient-to-r from-emerald-50 to-sky-50 border-emerald-300 shadow-sm"
+      : "bg-slate-50/90 border-slate-200 hover:bg-white"
+      }`}
   >
     {isPinned && (
       <div className="flex items-center gap-2 mb-3 text-emerald-600">
@@ -35,16 +35,14 @@ const Comment = memo(({ comment, formatDate, index, isPinned = false }) => (
         <img
           src={comment.profile_image}
           alt={`${comment.user_name}'s profile`}
-          className={`w-10 h-10 rounded-full object-cover border-2 flex-shrink-0  ${
-            isPinned ? "border-emerald-400" : "border-slate-300"
-          }`}
+          className={`w-10 h-10 rounded-full object-cover border-2 flex-shrink-0  ${isPinned ? "border-emerald-400" : "border-slate-300"
+            }`}
           loading="lazy"
         />
       ) : (
         <div
-          className={`p-2 rounded-full text-emerald-600 group-hover:bg-emerald-100 transition-colors ${
-            isPinned ? "bg-emerald-100" : "bg-slate-100"
-          }`}
+          className={`p-2 rounded-full text-emerald-600 group-hover:bg-emerald-100 transition-colors ${isPinned ? "bg-emerald-100" : "bg-slate-100"
+            }`}
         >
           <UserCircle2 className="w-5 h-5" />
         </div>
@@ -53,9 +51,8 @@ const Comment = memo(({ comment, formatDate, index, isPinned = false }) => (
         <div className="flex items-center justify-between gap-4 mb-2">
           <div className="flex items-center gap-2">
             <h4
-              className={`font-bold truncate ${
-                isPinned ? "text-emerald-900" : "text-slate-800"
-              }`}
+              className={`font-bold truncate ${isPinned ? "text-emerald-900" : "text-slate-800"
+                }`}
             >
               {comment.user_name}
             </h4>
@@ -89,15 +86,23 @@ const CommentForm = memo(({ onSubmit, isSubmitting, error }) => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert(
-          "File size must be less than 5MB. Please choose a smaller image.",
-        );
+        Swal.fire({
+          title: "Ukuran File Terlalu Besar",
+          text: "Maksimal ukuran gambar profil adalah 5MB.",
+          icon: "warning",
+          confirmButtonColor: "#0284c7",
+        });
         if (e.target) e.target.value = "";
         return;
       }
 
       if (!file.type.startsWith("image/")) {
-        alert("Please select a valid image file.");
+        Swal.fire({
+          title: "Format File Tidak Valid",
+          text: "Silakan pilih file gambar yang valid (PNG, JPG, WebP).",
+          icon: "warning",
+          confirmButtonColor: "#0284c7",
+        });
         if (e.target) e.target.value = "";
         return;
       }
@@ -475,22 +480,6 @@ const Komentar = () => {
           )}
         </div>
       </div>
-      <style jsx>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.05);
-          border-radius: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(99, 102, 241, 0.5);
-          border-radius: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: rgba(99, 102, 241, 0.7);
-        }
-      `}</style>
     </div>
   );
 };

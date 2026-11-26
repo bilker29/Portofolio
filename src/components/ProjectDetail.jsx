@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 import { toSlug } from "../utils/slug";
+import { supabase } from "../supabase";
 
 const TECH_ICONS = {
   React: Globe,
@@ -123,21 +124,42 @@ const ProjectDetails = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const storedProjects = JSON.parse(localStorage.getItem("projects")) || [];
-    // Cari project berdasarkan slug yang di-generate dari Title
-    const selectedProject = storedProjects.find(
-      (p) => toSlug(p.Title) === slug,
-    );
+    const loadProject = async () => {
+      const storedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
+      let selectedProject = storedProjects.find((p) => toSlug(p.Title) === slug);
 
-    if (selectedProject) {
-      const enhancedProject = {
-        ...selectedProject,
-        Features: selectedProject.Features || [],
-        TechStack: selectedProject.TechStack || [],
-        Github: selectedProject.Github || "https://github.com/EkiZR",
-      };
-      setProject(enhancedProject);
-    }
+      if (!selectedProject) {
+        try {
+          const { data } = await supabase.from("projects").select("*");
+          if (data?.length) {
+            const formatted = data.map((item) => ({
+              id: item.id,
+              Title: item.title || item.Title,
+              Description: item.description || item.Description,
+              Img: item.img || item.Img,
+              TechStack: item.tech_stack || item.techstack || item.TechStack,
+              Features: item.features || item.Features,
+              Link: item.link || item.Link,
+              Github: item.github || item.Github,
+            }));
+            selectedProject = formatted.find((p) => toSlug(p.Title) === slug);
+          }
+        } catch (err) {
+          console.error("Failed loading project details:", err);
+        }
+      }
+
+      if (selectedProject) {
+        const enhancedProject = {
+          ...selectedProject,
+          Features: selectedProject.Features || [],
+          TechStack: selectedProject.TechStack || [],
+          Github: selectedProject.Github || "https://github.com/bilker29",
+        };
+        setProject(enhancedProject);
+      }
+    };
+    loadProject();
   }, [slug]);
 
   if (!project) {
@@ -153,7 +175,7 @@ const ProjectDetails = () => {
     );
   }
 
-  const projectUrl = `https://ekizr.com/project/${toSlug(project.Title)}`;
+  const projectUrl = `https://billy-wicaksono-website-portofolio.vercel.app/project/${toSlug(project.Title)}`;
 
   return (
     <>
@@ -190,7 +212,7 @@ const ProjectDetails = () => {
             "author": {
               "@type": "Person",
               "name": "Billy Wicaksono",
-              "url": "https://billywicaksono.com"
+              "url": "https://billy-wicaksono-website-portofolio.vercel.app/"
             }
           }
         `}</script>
@@ -318,68 +340,6 @@ const ProjectDetails = () => {
           </div>
         </div>
 
-        <style jsx>{`
-          @keyframes blob {
-            0% {
-              transform: translate(0px, 0px) scale(1);
-            }
-            33% {
-              transform: translate(30px, -50px) scale(1.1);
-            }
-            66% {
-              transform: translate(-20px, 20px) scale(0.9);
-            }
-            100% {
-              transform: translate(0px, 0px) scale(1);
-            }
-          }
-          .animate-blob {
-            animation: blob 10s infinite;
-          }
-          .animation-delay-2000 {
-            animation-delay: 2s;
-          }
-          .animation-delay-4000 {
-            animation-delay: 4s;
-          }
-          .animate-fadeIn {
-            animation: fadeIn 0.7s ease-out;
-          }
-          .animate-slideInLeft {
-            animation: slideInLeft 0.7s ease-out;
-          }
-          .animate-slideInRight {
-            animation: slideInRight 0.7s ease-out;
-          }
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-            }
-            to {
-              opacity: 1;
-            }
-          }
-          @keyframes slideInLeft {
-            from {
-              opacity: 0;
-              transform: translateX(-30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-          @keyframes slideInRight {
-            from {
-              opacity: 0;
-              transform: translateX(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateX(0);
-            }
-          }
-        `}</style>
       </div>
     </>
   );

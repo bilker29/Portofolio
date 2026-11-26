@@ -4,7 +4,6 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { supabase } from "../supabase";
 
-// Media Items Data
 const GALLERY_ROW_TOP = [
   {
     id: "top-1",
@@ -35,7 +34,7 @@ const GALLERY_ROW_TOP = [
     aspect: "landscape",
     title: "Kejuaraan Karate Nasional",
     subtitle: "Prestasi & Pertandingan",
-    date: "2024",
+    date: "2025",
     tag: "Sports & Karate",
     src: "/gallery/photo2.png",
     caption: "Fokus dan kedisiplinan dalam gelanggang pertandingan Karate.",
@@ -46,7 +45,7 @@ const GALLERY_ROW_TOP = [
     aspect: "portrait",
     title: "Presentasi & IT Workshop",
     subtitle: "Pembicara & Diskusi Teknologi",
-    date: "2023",
+    date: "2025",
     tag: "Workshop",
     src: "/gallery/photo3.png",
     caption: "Berbagi pengalaman dan wawasan seputar dunia software.",
@@ -57,11 +56,11 @@ const GALLERY_ROW_TOP = [
     aspect: "portrait",
     title: "Continuous Integration & Tech Workflow",
     subtitle: "Short Clip",
-    date: "2024",
+    date: "2026",
     tag: "Engineering",
     src: "https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-man-typing-on-a-computer-keyboard-40330-large.mp4",
     poster: "/Animation1.gif",
-    caption: "Keterampilan ngetik & otomasi alur kerja pengembangan web.",
+    caption: "Keterampilan coding & otomasi alur kerja pengembangan web.",
   },
 ];
 
@@ -83,7 +82,7 @@ const GALLERY_ROW_BOTTOM = [
     aspect: "landscape",
     title: "Web App & Dashboard Showcase",
     subtitle: "Interactive UI",
-    date: "2024",
+    date: "2026",
     tag: "Portfolio Showcase",
     src: "https://assets.mixkit.co/videos/preview/mixkit-man-working-on-his-laptop-computer-39886-large.mp4",
     poster: "/Animation1.gif",
@@ -95,7 +94,7 @@ const GALLERY_ROW_BOTTOM = [
     aspect: "landscape",
     title: "Kuliah & Kolaborasi Project",
     subtitle: "Teknik Informatika",
-    date: "2023",
+    date: "2025",
     tag: "University",
     src: "/gallery/photo1.png",
     caption: "Kolaborasi bersama rekan-rekan seperjuangan di bangku perkuliahan.",
@@ -105,8 +104,8 @@ const GALLERY_ROW_BOTTOM = [
     type: "photo",
     aspect: "portrait",
     title: "Sesi Latihan Karate",
-    subtitle: "Kedisiplinan & Latihan Otot",
-    date: "2024",
+    subtitle: "Kedisiplinan & Latihan Mental",
+    date: "2025",
     tag: "Karate Do",
     src: "/gallery/photo2.png",
     caption: "Latihan rutin menjaga stamina dan konsentrasi mental.",
@@ -116,11 +115,11 @@ const GALLERY_ROW_BOTTOM = [
     type: "photo",
     aspect: "landscape",
     title: "Tech Conference & Networking",
-    subtitle: "Meetup & Discussion",
-    date: "2024",
+    subtitle: "GDGoC & GSA Activation",
+    date: "2026",
     tag: "Networking",
     src: "/gallery/photo3.png",
-    caption: "Bertukar gagasan bersama para profesional dan antusias IT.",
+    caption: "Bertukar gagasan bersama para profesional dan komunitas IT.",
   },
 ];
 
@@ -168,7 +167,7 @@ const PolaroidCard = memo(({ item, onClick }) => {
                 src={item.src}
                 alt={item.title}
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
             </div>
           )}
@@ -230,6 +229,14 @@ export default function Gallery() {
     fetchGallery();
   }, []);
 
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setSelectedItem(null);
+    };
+    if (selectedItem) window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedItem]);
+
   const topMarquee = [...rowTop, ...rowTop];
   const bottomMarquee = [...rowBottom, ...rowBottom];
 
@@ -249,12 +256,12 @@ export default function Gallery() {
           Activity Gallery
         </h2>
         <p className="mt-2 text-slate-600 max-w-2xl mx-auto text-sm md:text-base font-medium">
-          Kumpulan momen perkuliahan, kejuaraan Karate nasional, seminar IT, serta kebersamaan harian.
+          Kumpulan momen perkuliahan, kejuaraan Karate nasional, seminar IT, serta aktivitas GDGoC & GSA.
         </p>
       </div>
 
-      {/* Marquee Rows Container */}
-      <div className="flex flex-col gap-6 relative">
+      {/* Marquee Rows Container with smooth horizontal fade mask */}
+      <div className="flex flex-col gap-6 relative marquee-mask">
         <div className="overflow-hidden w-full py-2">
           <div className="flex gap-6 w-max animate-marquee-left">
             {topMarquee.map((item, idx) => (
@@ -282,8 +289,14 @@ export default function Gallery() {
 
       {/* LIGHTBOX MODAL */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md animate-fadeIn">
-          <div className="relative w-full max-w-3xl glass-card border border-slate-200/90 rounded-3xl shadow-2xl overflow-hidden text-slate-800 bg-white">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md animate-fadeIn"
+          onClick={() => setSelectedItem(null)}
+        >
+          <div
+            className="relative w-full max-w-3xl glass-card border border-slate-200/90 rounded-3xl shadow-2xl overflow-hidden text-slate-800 bg-white"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
               <div className="flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-sky-100 text-sky-800 font-extrabold text-xs">
@@ -296,6 +309,7 @@ export default function Gallery() {
               <button
                 onClick={() => setSelectedItem(null)}
                 className="p-2 rounded-full text-slate-400 hover:text-slate-800 hover:bg-slate-200/60 transition-colors"
+                aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>

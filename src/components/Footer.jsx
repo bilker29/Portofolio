@@ -1,10 +1,12 @@
 import React from "react";
-import { ArrowUp, Code2, Heart, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ArrowUp, Code2, Lock } from "lucide-react";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const scrollToTop = () => {
+  const scrollToTop = (e) => {
+    e?.preventDefault?.();
     window.scrollTo({
       top: 0,
       behavior: "smooth",
@@ -12,7 +14,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative border-t border-slate-200/80 bg-white/60 backdrop-blur-xl mt-12 py-10 px-[5%] sm:px-[5%] lg:px-[10%]">
+    <footer className="relative border-t border-slate-200/80 bg-white/65 backdrop-blur-xl mt-12 py-10 px-[5%] sm:px-[5%] lg:px-[10%]">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Brand Info */}
         <div className="flex items-center gap-3">
@@ -28,14 +30,23 @@ const Footer = () => {
               Billy Wicaksono
             </a>
             <p className="text-xs text-slate-500 font-medium">
-              Google Student Ambassador 2026 | IT Enthusiast
+              Google Student Ambassador & GDGoC Core Team | Software Engineer
             </p>
           </div>
         </div>
 
-        {/* Copyright text */}
-        <div className="text-center text-xs text-slate-500 font-semibold flex items-center gap-1">
-          <span>© {currentYear} BilKer™. Built with passion & precision</span>
+        {/* Copyright + Subtle Admin Link */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 text-center text-xs text-slate-500 font-semibold">
+          <span>© {currentYear} BilKer. Built with passion & precision</span>
+          <span className="hidden sm:inline text-slate-300">•</span>
+          <Link
+            to="/login"
+            className="inline-flex items-center gap-1 text-slate-400 hover:text-sky-600 transition-colors"
+            title="Admin Dashboard Login"
+          >
+            <Lock className="w-3 h-3" />
+            <span>Admin</span>
+          </Link>
         </div>
 
         {/* Back To Top Button */}

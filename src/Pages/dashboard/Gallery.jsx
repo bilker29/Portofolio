@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { supabase } from "../../supabase";
 import Swal from "sweetalert2";
 import {
@@ -495,8 +496,14 @@ export default function GalleryManager() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item) => (
-            <Card key={item.id}>
+          {items.map((item, idx) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: Math.min(idx * 0.05, 0.3) }}
+            >
+              <Card>
               <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 mb-3 border border-slate-100">
                 {item.type === "video" ? (
                   <div className="relative w-full h-full flex items-center justify-center">
@@ -567,6 +574,7 @@ export default function GalleryManager() {
                 </div>
               </div>
             </Card>
+            </motion.div>
           ))}
         </div>
       )}
